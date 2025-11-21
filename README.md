@@ -1,73 +1,87 @@
-# Welcome to your Lovable project
+🧠 Arziki – AI-Powered Predictive Inventory Intelligence
 
-## Project info
+Arziki is a web-based analytics platform that helps supermarkets and retail businesses make data-driven decisions using AI-powered demand forecasting, sales insights, and natural-language queries. Built for AWS Community Day West Africa 2025 Hackathon under the theme
+AI-Driven Enterprise Operations: Enhancing Security, Accelerating DevOps, and Scaling Infrastructure Across Cloud and Hybrid Environments.
 
-**URL**: https://lovable.dev/projects/48082a26-28c9-4feb-b95f-18fc88e71383
+🚀 Overview
+Most small and mid-size retail stores in West Africa struggle with:
+Overstocking or stockouts due to poor demand prediction
+Limited visibility into sales performance
+Manual, error-prone data reporting
+Arziki solves this by analyzing sales and inventory data, predicting when items will run out, suggesting restock quantities, and providing intelligent insights through a simple dashboard.
 
-## How can I edit this code?
+🧩 Core Features
 
-There are several ways of editing your application.
+📊 Data Upload – Upload your supermarket’s CSV/Excel data directly from the dashboard.
+🧠 AI Analysis – Runs predictive models using AWS Forecast and Bedrock.
+💬 Natural Language Query – Query your sales data in plain English using Amazon Q.
+📈 Visual Insights – Auto-generated charts showing trends, best-selling items, and low-stock alerts.
+📥 PDF Reports – Instantly download AI-generated insights as a PDF summary.
 
-**Use Lovable**
+🏗️ Tech Stack
+Frontend
+React + TypeScript
+TailwindCSS
+React Hot Toast (for notifications)
+Deployed via AWS Amplify / Render
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/48082a26-28c9-4feb-b95f-18fc88e71383) and start prompting.
+Backend
+Node.js (Express)
+AWS S3 for file storage
+AWS Forecast / Bedrock for predictions
+Amazon Q for conversational insights
+Deployed on Render
 
-Changes made via Lovable will be committed automatically to this repo.
+🔌 API Integration
+Endpoint
+POST https://arziki.onrender.com/analyze
 
-**Use your preferred IDE**
+Request Body
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+multipart/form-data
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+Field	Type	Description
+file	binary	Sales or inventory CSV file
+store_name	string	Name of the store/supermarket
+email	string	User’s email address (for identification)
+Response
 
-Follow these steps:
+A downloadable PDF report containing visual insights, recommendations, and forecasts.
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+🧾 Example Workflow
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+Fill in your store details (name, location, email).
 
-# Step 3: Install the necessary dependencies.
-npm i
+Upload your sales and inventory data files.
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+Wait for processing (approx. 3–5 seconds).
+
+The system auto-downloads your AI-generated report.pdf.
+
+🧪 Local Development Setup
+# Clone the repo
+git clone https://github.com/dabirax/arziki.git
+cd arziki
+
+# Install dependencies
+npm install
+
+# Run frontend
 npm run dev
-```
 
-**Edit a file directly in GitHub**
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+Ensure your backend (/analyze endpoint) is running and accessible.
 
-**Use GitHub Codespaces**
+🧠 Architecture (Simplified)
+[User Upload] → [Frontend Dashboard] → [Render API /analyze] → [AWS S3 Storage]
+         → [AI Analysis: Forecast + Bedrock] → [Generate Insights + PDF]
+         → [Response: PDF Download]
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+🏅 Hackathon Impact
 
-## What technologies are used for this project?
+By giving supermarket managers real-time foresight, Arziki helps prevent losses, optimize inventory, and reduce waste — using the power of AI, without requiring any data-science background.
 
-This project is built with:
+👥 Team
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/48082a26-28c9-4feb-b95f-18fc88e71383) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+Project Arziki – AWS Community Day West Africa 2025
+Built by a small team of engineers passionate about AI, retail, and scalable cloud solutions.
