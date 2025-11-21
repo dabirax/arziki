@@ -83,5 +83,5 @@ By giving supermarket managers real-time foresight, Arziki helps prevent losses,
 
 👥 Team
 
-Project Arziki – AWS Community Day West Africa 2025
+Project Arziki 
 Built by a small team of engineers passionate about AI, retail, and scalable cloud solutions.

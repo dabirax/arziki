@@ -83,7 +83,7 @@ const Dashboard = () => {
               {user && <p className="text-xs text-muted-foreground">Welcome, {user.email}</p>}
             </div>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2">
             <Link to="/create-report">
               <Button variant="hero" size="sm">
                 <Plus className="w-4 h-4 mr-1x" />
