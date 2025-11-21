@@ -1,253 +1,215 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
-import { toast } from "sonner";
-import { Loader2, CheckCircle2, Upload, ArrowLeft } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Badge } from "@/components/ui/badge";
+import { FileText, Download, MessageSquare, Calendar, TrendingUp, LogOut, Plus } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/useAuth";
 import logoIcon from "@/assets/logo-icon.png";
+import ChatbotInterface from "@/components/ChatbotInterface";
+import { toast } from "sonner";
+
+interface Report {
+  id: string;
+  title: string;
+  date: string;
+  type: "forecast" | "inventory" | "analysis";
+  status: "completed" | "processing";
+  summary: string;
+}
 
 const Dashboard = () => {
-  const [step, setStep] = useState<"form" | "upload" | "processing" | "success">("form");
-  const [formData, setFormData] = useState({
-    fullName: "",
-    storeName: "",
-    email: "",
-    location: "",
-  });
-  const [files, setFiles] = useState<FileList | null>(null);
+  const [selectedReport, setSelectedReport] = useState<Report | null>(null);
+  const [showChat, setShowChat] = useState(false);
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
-  const handleFormSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!formData.fullName || !formData.storeName || !formData.email || !formData.location) {
-      toast.error("Please fill in all fields");
-      return;
-    }
+  // Mock data
+  const reports: Report[] = [
+    {
+      id: "1",
+      title: "Demand Forecast Report - November 2025",
+      date: "2025-11-20",
+      type: "forecast",
+      status: "completed",
+      summary: "AI-generated demand forecast showing expected sales trends for the next 4 weeks with stockout alerts for 3 products.",
+    },
+    {
+      id: "2",
+      title: "Inventory Analysis - October 2025",
+      date: "2025-10-15",
+      type: "inventory",
+      status: "completed",
+      summary: "Comprehensive inventory analysis revealing overstocked items worth ₦125,000 and optimization opportunities.",
+    },
+    {
+      id: "3",
+      title: "Sales Performance Analysis",
+      date: "2025-11-18",
+      type: "analysis",
+      status: "completed",
+      summary: "Detailed breakdown of sales performance across product categories with profitability insights.",
+    },
+  ];
 
-    if (!formData.email.includes("@")) {
-      toast.error("Please enter a valid email address");
-      return;
-    }
-
-    toast.success("Information saved! Now upload your data files.");
-    setStep("upload");
+  const handleChatWithReport = (report: Report) => {
+    setSelectedReport(report);
+    setShowChat(true);
   };
 
-  const handleFileUpload = () => {
-    if (!files || files.length === 0) {
-      toast.error("Please select at least one file");
-      return;
-    }
+  const handleLogout = () => {
+    logout();
+    toast.success("Logged out successfully");
+    navigate("/");
+  };
 
-    setStep("processing");
-    
-    // Simulate file processing
-    setTimeout(() => {
-      setStep("success");
-      toast.success("Analysis complete! Check your email for insights.");
-    }, 3000);
+  const getTypeColor = (type: string) => {
+    const colors = {
+      forecast: "bg-primary/10 text-primary border-primary/30",
+      inventory: "bg-accent/10 text-accent-foreground border-accent/30",
+      analysis: "bg-secondary/10 text-secondary-foreground border-secondary/30",
+    };
+    return colors[type as keyof typeof colors] || colors.analysis;
   };
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border/50 backdrop-blur-sm bg-background/80">
+      <header className="border-b border-border/50 backdrop-blur-sm bg-background/80 sticky  top-0 z-40">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+          <div className="flex items-center gap-3">
             <img src={logoIcon} alt="Arziki" className="w-10 h-10" />
-            <h1 className="text-2xl font-bold text-primary">Arziki</h1>
-          </Link>
-          <Link to="/">
-            <Button variant="ghost" size="sm">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Home
+            <div>
+              <h1 className="text-2xl font-bold text-primary">Arziki</h1>
+              {user && <p className="text-xs text-muted-foreground">Welcome, {user.email}</p>}
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <Link to="/create-report">
+              <Button variant="hero" size="sm">
+                <Plus className="w-4 h-4 mr-1x" />
+                Generate Report
+              </Button>
+            </Link>
+            <Button variant="ghost" size="sm" onClick={handleLogout}>
+              <LogOut className="w-4 h-4 mr-1" />
+              Logout
             </Button>
-          </Link>
+          </div>
         </div>
       </header>
 
-      <div className="container mx-auto px-4 py-12">
-        <div className="max-w-2xl mx-auto">
-          {/* Progress Indicator */}
+      <div className="container mx-auto px-4 pt-2 pb-12">
+        <div className="max-w-6xl mx-auto">
           <div className="mb-8">
-            <div className="flex items-center justify-between mb-4">
-              <div className={`flex items-center gap-2 ${step === "form" ? "text-primary" : "text-muted-foreground"}`}>
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step === "form" ? "bg-primary text-primary-foreground" : "bg-secondary"}`}>
-                  1
-                </div>
-                <span className="text-sm font-medium hidden sm:inline">Store Info</span>
-              </div>
-              <div className="flex-1 h-1 bg-secondary mx-4">
-                <div className={`h-full bg-primary transition-all duration-500 ${step === "upload" || step === "processing" || step === "success" ? "w-1/2" : "w-0"}`}></div>
-              </div>
-              <div className={`flex items-center gap-2 ${step === "upload" || step === "processing" || step === "success" ? "text-primary" : "text-muted-foreground"}`}>
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step === "upload" || step === "processing" || step === "success" ? "bg-primary text-primary-foreground" : "bg-secondary"}`}>
-                  2
-                </div>
-                <span className="text-sm font-medium hidden sm:inline">Upload Data</span>
-              </div>
-              <div className="flex-1 h-1 bg-secondary mx-4">
-                <div className={`h-full bg-primary transition-all duration-500 ${step === "success" ? "w-full" : "w-0"}`}></div>
-              </div>
-              <div className={`flex items-center gap-2 ${step === "success" ? "text-primary" : "text-muted-foreground"}`}>
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step === "success" ? "bg-primary text-primary-foreground" : "bg-secondary"}`}>
-                  3
-                </div>
-                <span className="text-sm font-medium hidden sm:inline">Complete</span>
-              </div>
-            </div>
+            <p className="text-muted-foreground font-bold">View and manage your AI-generated business insights</p>
           </div>
 
-          <Card className="p-8 bg-gradient-to-b from-card to-secondary/30 shadow-lg">
-            {/* Form Step */}
-            {step === "form" && (
-              <div className="animate-fade-in">
-                <div className="text-center mb-8">
-                  <h2 className="text-3xl font-bold mb-2 text-foreground">Welcome to Arziki</h2>
-                  <p className="text-muted-foreground">Let's get your store set up for smart analytics</p>
-                </div>
-                
-                <form onSubmit={handleFormSubmit} className="space-y-6">
-                  <div>
-                    <Label htmlFor="fullName">Full Name</Label>
-                    <Input
-                      id="fullName"
-                      type="text"
-                      placeholder="Ade Mustapha"
-                      value={formData.fullName}
-                      onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                      className="mt-2"
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="storeName">Store / Supermarket Name</Label>
-                    <Input
-                      id="storeName"
-                      type="text"
-                      placeholder="ABC Supermarket"
-                      value={formData.storeName}
-                      onChange={(e) => setFormData({ ...formData, storeName: e.target.value })}
-                      className="mt-2"
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="email">Email Address</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="manager@store.com"
-                      value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="mt-2"
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="location">Location</Label>
-                    <Input
-                      id="location"
-                      type="text"
-                      placeholder="Lagos, Nigeria"
-                      value={formData.location}
-                      onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                      className="mt-2"
-                    />
-                  </div>
-
-                  <Button type="submit" variant="hero" size="lg" className="w-full">
-                    Continue to Upload
-                  </Button>
-                </form>
-              </div>
-            )}
-
-            {/* Upload Step */}
-            {step === "upload" && (
-              <div className="animate-fade-in">
-                <div className="text-center mb-8">
-                  <h2 className="text-3xl font-bold mb-2 text-foreground">Upload Your Data</h2>
-                  <p className="text-muted-foreground">Upload your sales and inventory files (CSV, Excel, or JSON)</p>
-                </div>
-
-                <div className="space-y-6">
-                  <div className="border-2 border-dashed border-border rounded-lg p-12 text-center hover:border-primary transition-colors cursor-pointer bg-secondary/20">
-                    <Upload className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-                    <Label htmlFor="fileUpload" className="cursor-pointer">
-                      <span className="text-primary font-medium hover:underline">Click to upload</span> or drag and drop
-                    </Label>
-                    <p className="text-sm text-muted-foreground mt-2">CSV, Excel, or JSON files</p>
-                    <Input
-                      id="fileUpload"
-                      type="file"
-                      multiple
-                      accept=".csv,.xlsx,.xls,.json"
-                      onChange={(e) => setFiles(e.target.files)}
-                      className="hidden"
-                    />
-                  </div>
-
-                  {files && files.length > 0 && (
-                    <div className="bg-secondary/50 rounded-lg p-4">
-                      <p className="text-sm font-medium mb-2 text-foreground">Selected files:</p>
-                      {Array.from(files).map((file, idx) => (
-                        <p key={idx} className="text-sm text-muted-foreground">
-                          {file.name} ({(file.size / 1024).toFixed(2)} KB)
-                        </p>
-                      ))}
+          <div className="grid lg:grid-cols-3 gap-8">
+            {/* Reports List */}
+            <div className="lg:col-span-2 space-y-4">
+              {reports.map((report) => (
+                <Card key={report.id} className="p-6 hover:shadow-lg transition-shadow bg-gradient-to-br from-card to-secondary/20">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-start gap-4">
+                      <div className="p-3 rounded-lg bg-primary/10">
+                        <FileText className="w-6 h-6 text-primary" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-lg text-foreground mb-1">{report.title}</h3>
+                        <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                          <span className="flex items-center gap-1">
+                            <Calendar className="w-4 h-4" />
+                            {new Date(report.date).toLocaleDateString()}
+                          </span>
+                          <Badge variant="outline" className={getTypeColor(report.type)}>
+                            {report.type}
+                          </Badge>
+                        </div>
+                      </div>
                     </div>
-                  )}
+                  </div>
+                  
+                  <p className="text-sm text-muted-foreground mb-4">{report.summary}</p>
+                  
+                  <div className="flex gap-2">
+                    <Button variant="outline" size="sm" className="flex-1">
+                      <Download className="w-4 h-4 mr-2" />
+                      Download PDF
+                    </Button>
+                    <Button 
+                      variant="hero" 
+                      size="sm" 
+                      className="flex-1"
+                      onClick={() => handleChatWithReport(report)}
+                    >
+                      <MessageSquare className="w-4 h-4 mr-2" />
+                      Chat About Report
+                    </Button>
+                  </div>
+                </Card>
+              ))}
 
-                  <Button 
-                    onClick={handleFileUpload} 
-                    variant="hero" 
-                    size="lg" 
-                    className="w-full"
-                    disabled={!files || files.length === 0}
-                  >
-                    Start Analysis
-                  </Button>
+              {reports.length === 0 && (
+                <Card className="p-12 text-center bg-secondary/20">
+                  <FileText className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+                  <h3 className="text-xl font-semibold mb-2 text-foreground">No Reports Yet</h3>
+                  <p className="text-muted-foreground mb-6">Upload your data to generate your first AI-powered report</p>
+                  <Link to="/dashboard">
+                    <Button variant="hero">Upload Data</Button>
+                  </Link>
+                </Card>
+              )}
+            </div>
+
+            {/* Quick Stats Sidebar */}
+            <div className="space-y-4">
+              <Card className="p-6 bg-gradient-to-br from-primary/5 to-accent/5">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="p-2 rounded-lg bg-primary/10">
+                    <TrendingUp className="w-5 h-5 text-primary" />
+                  </div>
+                  <h3 className="font-semibold text-foreground">Quick Insights</h3>
                 </div>
-              </div>
-            )}
-
-            {/* Processing Step */}
-            {step === "processing" && (
-              <div className="animate-fade-in text-center py-12">
-                <Loader2 className="w-16 h-16 mx-auto mb-6 text-primary animate-spin" />
-                <h2 className="text-2xl font-bold mb-2 text-foreground">Analyzing Your Data...</h2>
-                <p className="text-muted-foreground">Our AI is processing your sales and inventory data</p>
-              </div>
-            )}
-
-            {/* Success Step */}
-            {step === "success" && (
-              <div className="animate-fade-in text-center py-12">
-                <div className="w-20 h-20 mx-auto mb-6 bg-primary/10 rounded-full flex items-center justify-center">
-                  <CheckCircle2 className="w-12 h-12 text-primary" />
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Total Reports</p>
+                    <p className="text-2xl font-bold text-foreground">{reports.length}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">Latest Analysis</p>
+                    <p className="text-sm font-medium text-foreground">
+                      {reports[0] ? new Date(reports[0].date).toLocaleDateString() : "N/A"}
+                    </p>
+                  </div>
                 </div>
-                <h2 className="text-3xl font-bold mb-4 text-foreground">Analysis Complete!</h2>
-                <p className="text-lg text-muted-foreground mb-8 max-w-md mx-auto">
-                  Your analysis is in progress! You'll receive charts, insights, and recommendations from Arziki directly in your email shortly.
+              </Card>
+
+              <Card className="p-6 bg-secondary/20">
+                <h3 className="font-semibold mb-3 text-foreground">Need Help?</h3>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Chat with Arziki Assistant to understand all your reports better
                 </p>
-                <div className="bg-accent/10 border border-accent/30 rounded-lg p-6 mb-8">
-                  <p className="text-sm text-foreground">
-                    <strong>Email sent to:</strong> {formData.email}
-                  </p>
-                </div>
-                <Link to="/">
-                  <Button variant="hero" size="lg">
-                    Return to Home
-                  </Button>
-                </Link>
-              </div>
-            )}
-          </Card>
+                <Button 
+                  variant="outline" 
+                  className="w-full"
+                  onClick={() => setShowChat(true)}
+                >
+                  <MessageSquare className="w-4 h-4 mr-2" />
+                  Open Chat
+                </Button>
+              </Card>
+            </div>
+          </div>
         </div>
       </div>
+
+      {/* Chatbot Overlay */}
+      {showChat && (
+        <ChatbotInterface 
+          onClose={() => setShowChat(false)} 
+          activeReport={selectedReport}
+        />
+      )}
     </div>
   );
 };

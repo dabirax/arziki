@@ -16,16 +16,18 @@ const Index = () => {
             <img src={logoIcon} alt="Arziki" className="w-10 h-10" />
             <h1 className="text-2xl font-bold text-primary">Arziki</h1>
           </div>
-          <Link to="/dashboard">
-            <Button variant="hero" size="lg">Get Started</Button>
-          </Link>
+          <div className="flex gap-4">
+            <Link to="/login">
+              <Button variant="hero" size="lg">Sign In</Button>
+            </Link>
+          </div>
         </div>
       </header>
 
       {/* Hero Section */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-accent/5"></div>
-        <div className="container mx-auto px-4 py-20 md:py-32 relative">
+        <div className="container mx-auto px-4 py-20 md:py-10 relative">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-8 animate-fade-in">
               <div className="inline-block">
@@ -44,7 +46,7 @@ const Index = () => {
                 AI-powered insights that predict demand, prevent stockouts, and optimize your retail operations.
               </p>
               <div className="flex flex-wrap gap-4">
-                <Link to="/dashboard">
+                <Link to="/login">
                   <Button variant="hero" size="lg" className="text-lg px-8 py-6 h-auto">
                     Get Started <Sparkles className="ml-2 w-5 h-5" />
                   </Button>
@@ -64,7 +66,7 @@ const Index = () => {
       </section>
 
       {/* Benefits Section */}
-      <section className="py-20 bg-secondary/30">
+      <section className="py-10 bg-secondary/30">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16 animate-fade-in">
             <h2 className="text-4xl font-bold mb-4 text-foreground">Why Choose Arziki?</h2>
@@ -98,7 +100,7 @@ const Index = () => {
       </section>
 
       {/* How It Works Section */}
-      <section className="py-20">
+      <section className="py-10">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16 animate-fade-in">
             <h2 className="text-4xl font-bold mb-4 text-foreground">How It Works</h2>
