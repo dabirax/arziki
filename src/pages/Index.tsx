@@ -132,7 +132,7 @@ const Index = () => {
       </section>
 
       {/* Tech Credibility Section */}
-      <section className="py-20 bg-secondary/30">
+      {/* <section className="py-20 bg-secondary/30">
         <div className="container mx-auto px-4">
           <div className="text-center animate-fade-in">
             <h2 className="text-3xl font-bold mb-8 text-foreground">Powered by Enterprise-Grade Technology</h2>
@@ -155,7 +155,35 @@ const Index = () => {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
+      {/* Tech Credibility Section */}
+<section className="py-20 bg-secondary/30">
+  <div className="container mx-auto px-4">
+    <div className="text-center animate-fade-in">
+      <h2 className="text-3xl font-bold mb-8 text-foreground">
+        Powered by Cutting-Edge Google Cloud Technology
+      </h2>
+      <div className="flex flex-wrap justify-center items-center gap-8 opacity-70">
+        <div className="px-6 py-3 bg-card rounded-lg border border-border shadow-sm">
+          <span className="font-semibold text-foreground">Google Cloud Storage</span>
+        </div>
+        <div className="px-6 py-3 bg-card rounded-lg border border-border shadow-sm">
+          <span className="font-semibold text-foreground">Cloud Functions</span>
+        </div>
+        <div className="px-6 py-3 bg-card rounded-lg border border-border shadow-sm">
+          <span className="font-semibold text-foreground">BigQuery</span>
+        </div>
+        <div className="px-6 py-3 bg-card rounded-lg border border-border shadow-sm">
+          <span className="font-semibold text-foreground">Vertex AI</span>
+        </div>
+        <div className="px-6 py-3 bg-card rounded-lg border border-border shadow-sm">
+          <span className="font-semibold text-foreground">Firestore</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 
       {/* Footer */}
       <footer className="py-12 border-t border-border/50 bg-card">

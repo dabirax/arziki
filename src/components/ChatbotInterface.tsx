@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { X, Send, Volume2, FileText, BarChart3, Download, Sparkles } from "lucide-react";
+import { X, Send, Volume2, FileText, BarChart3, Download, Sparkles, Mic } from "lucide-react";
 import { toast } from "sonner";
 
 interface Message {
@@ -29,7 +29,9 @@ const ChatbotInterface = ({ onClose, activeReport }: ChatbotInterfaceProps) => {
     },
   ]);
   const [input, setInput] = useState("");
+  const [isRecording, setIsRecording] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const recognitionRef = useRef<any>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -38,6 +40,15 @@ const ChatbotInterface = ({ onClose, activeReport }: ChatbotInterfaceProps) => {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  useEffect(() => {
+    // Cleanup speech recognition on unmount
+    return () => {
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
+    };
+  }, []);
 
   const handleSend = () => {
     if (!input.trim()) return;
@@ -88,6 +99,7 @@ const ChatbotInterface = ({ onClose, activeReport }: ChatbotInterfaceProps) => {
 
   const quickActions = [
     { icon: BarChart3, label: "Show Sales Trend", action: "show trend" },
+    { icon: Download, label: "Download Report", action: "download" },
     { icon: FileText, label: "Generate Forecast", action: "forecast" },
   ];
 
@@ -108,6 +120,68 @@ const ChatbotInterface = ({ onClose, activeReport }: ChatbotInterfaceProps) => {
       toast.success("Reading message aloud");
     } else {
       toast.error("Text-to-speech not supported in this browser");
+    }
+  };
+
+  const handleAudioInput = () => {
+    // Check browser support
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    
+    if (!SpeechRecognition) {
+      toast.error("Voice input not supported in this browser. Try Chrome or Edge.");
+      return;
+    }
+
+    if (!isRecording) {
+      // Start recording
+      try {
+        if (!recognitionRef.current) {
+          recognitionRef.current = new SpeechRecognition();
+          recognitionRef.current.continuous = false;
+          recognitionRef.current.interimResults = false;
+          recognitionRef.current.lang = 'en-US';
+
+          recognitionRef.current.onstart = () => {
+            setIsRecording(true);
+            toast.info("Listening... Speak now");
+          };
+
+          recognitionRef.current.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            setInput(transcript);
+            toast.success("Voice captured successfully");
+          };
+
+          recognitionRef.current.onerror = (event) => {
+            console.error("Speech recognition error:", event.error);
+            setIsRecording(false);
+            if (event.error === 'no-speech') {
+              toast.error("No speech detected. Please try again.");
+            } else if (event.error === 'not-allowed') {
+              toast.error("Microphone access denied. Please allow microphone access.");
+            } else {
+              toast.error(`Voice input error: ${event.error}`);
+            }
+          };
+
+          recognitionRef.current.onend = () => {
+            setIsRecording(false);
+          };
+        }
+
+        recognitionRef.current.start();
+      } catch (error) {
+        console.error("Failed to start recording:", error);
+        toast.error("Failed to start voice input");
+        setIsRecording(false);
+      }
+    } else {
+      // Stop recording
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
+      setIsRecording(false);
+      toast.info("Voice input stopped");
     }
   };
 
@@ -188,13 +262,25 @@ const ChatbotInterface = ({ onClose, activeReport }: ChatbotInterfaceProps) => {
         {/* Input */}
         <div className="p-4 border-t border-border">
           <div className="flex gap-2">
-            <Input
-              placeholder="Ask about your business data..."
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyPress={(e) => e.key === "Enter" && handleSend()}
-              className="flex-1"
-            />
+            <div className="relative flex-1">
+              <Input
+                placeholder="Ask about your business data..."
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyPress={(e) => e.key === "Enter" && handleSend()}
+                className="pr-10"
+              />
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleAudioInput}
+                className={`absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 ${
+                  isRecording ? "text-red-500 animate-pulse" : "text-muted-foreground hover:text-primary"
+                }`}
+              >
+                <Mic className="w-4 h-4" />
+              </Button>
+            </div>
             <Button onClick={handleSend} variant="hero" size="icon">
               <Send className="w-4 h-4" />
             </Button>

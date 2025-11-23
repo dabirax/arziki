@@ -1,64 +1,77 @@
-🧠 Arziki – AI-Powered Predictive Inventory Intelligence
+# 🧠 Arziki – AI-Powered Predictive Inventory Intelligence
 
-Arziki is a web-based analytics platform that helps supermarkets and retail businesses make data-driven decisions using AI-powered demand forecasting, sales insights, and natural-language queries. Built for AWS Community Day West Africa 2025 Hackathon under the theme
-AI-Driven Enterprise Operations: Enhancing Security, Accelerating DevOps, and Scaling Infrastructure Across Cloud and Hybrid Environments.
+Arziki is a web-based analytics platform that helps supermarkets and retail businesses make data-driven decisions using AI-powered demand forecasting, sales insights, and natural-language queries. Built for **GCP Community Hackathon 2025** under the theme:  
+**AI-Driven Enterprise Operations: Enhancing Security, Accelerating DevOps, and Scaling Infrastructure Across Cloud and Hybrid Environments.**
 
-🚀 Overview
-Most small and mid-size retail stores in West Africa struggle with:
-Overstocking or stockouts due to poor demand prediction
-Limited visibility into sales performance
-Manual, error-prone data reporting
-Arziki solves this by analyzing sales and inventory data, predicting when items will run out, suggesting restock quantities, and providing intelligent insights through a simple dashboard.
+---
 
-🧩 Core Features
+## 🚀 Overview
+Most small and mid-size retail stores in West Africa struggle with:  
+- Overstocking or stockouts due to poor demand prediction  
+- Limited visibility into sales performance  
+- Manual, error-prone data reporting  
 
-📊 Data Upload – Upload your supermarket’s CSV/Excel data directly from the dashboard.
-🧠 AI Analysis – Runs predictive models using AWS Forecast and Bedrock.
-💬 Natural Language Query – Query your sales data in plain English using Amazon Q.
-📈 Visual Insights – Auto-generated charts showing trends, best-selling items, and low-stock alerts.
-📥 PDF Reports – Instantly download AI-generated insights as a PDF summary.
+**Arziki** solves this by analyzing sales and inventory data, predicting when items will run out, suggesting restock quantities, and providing intelligent insights through a simple dashboard.
 
-🏗️ Tech Stack
-Frontend
-React + TypeScript
-TailwindCSS
-React Hot Toast (for notifications)
-Deployed via AWS Amplify / Render
+---
 
-Backend
-Node.js (Express)
-AWS S3 for file storage
-AWS Forecast / Bedrock for predictions
-Amazon Q for conversational insights
-Deployed on Render
+## 🧩 Core Features
 
-🔌 API Integration
-Endpoint
-POST https://arziki.onrender.com/analyze
+- **📊 Data Upload** – Upload your supermarket’s CSV/Excel data directly from the dashboard.  
+- **🧠 AI Analysis** – Runs predictive models using **Vertex AI**.  
+- **💬 Natural Language Query** – Query your sales data in plain English using **BigQuery ML + Natural Language API**.  
+- **📈 Visual Insights** – Auto-generated charts showing trends, best-selling items, and low-stock alerts.  
+- **📥 PDF Reports** – Instantly download AI-generated insights as a PDF summary.
 
-Request Body
+---
 
-multipart/form-data
+## 🏗️ Tech Stack
 
-Field	Type	Description
-file	binary	Sales or inventory CSV file
-store_name	string	Name of the store/supermarket
-email	string	User’s email address (for identification)
-Response
+**Frontend**  
+- React + TypeScript  
+- TailwindCSS  
+- React Hot Toast (for notifications)  
+- Deployed via **Firebase Hosting / Render**  
 
+**Backend**  
+- Node.js (Express)  
+- **Google Cloud Storage** for file storage  
+- **Vertex AI** for predictions  
+- **BigQuery ML + Natural Language API** for conversational insights  
+- Deployed on **Render / Cloud Run**
+
+---
+
+## 🔌 API Integration
+
+**Endpoint**  
+https://arziki-gcp.onrender.com/docs
+
+**Request Body** (`multipart/form-data`)
+
+| Field       | Type   | Description                        |
+|------------|--------|------------------------------------|
+| file       | binary | Sales or inventory CSV file         |
+| store_name | string | Name of the store/supermarket      |
+| email      | string | User’s email address (for identification) |
+
+**Response**  
 A downloadable PDF report containing visual insights, recommendations, and forecasts.
 
-🧾 Example Workflow
+---
 
-Fill in your store details (name, location, email).
+## 🧾 Example Workflow
 
-Upload your sales and inventory data files.
+1. Fill in your store details (name, location, email).  
+2. Upload your sales and inventory data files.  
+3. Wait for processing (approx. 3–5 seconds).  
+4. The system auto-downloads your AI-generated **report.pdf**.  
 
-Wait for processing (approx. 3–5 seconds).
+---
 
-The system auto-downloads your AI-generated report.pdf.
+## 🧪 Local Development Setup
 
-🧪 Local Development Setup
+```bash
 # Clone the repo
 git clone https://github.com/dabirax/arziki.git
 cd arziki
@@ -69,13 +82,11 @@ npm install
 # Run frontend
 npm run dev
 
-
-Ensure your backend (/analyze endpoint) is running and accessible.
-
 🧠 Architecture (Simplified)
-[User Upload] → [Frontend Dashboard] → [Render API /analyze] → [AWS S3 Storage]
-         → [AI Analysis: Forecast + Bedrock] → [Generate Insights + PDF]
+[User Upload] → [Frontend Dashboard] → [Render API /analyze] → [Google Cloud Storage]
+         → [AI Analysis: Vertex AI] → [Generate Insights + PDF]
          → [Response: PDF Download]
+
 
 🏅 Hackathon Impact
 
