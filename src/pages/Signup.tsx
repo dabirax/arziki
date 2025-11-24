@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "@/contexts/useAuth";
+import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import logoIcon from "@/assets/logo-icon.png";
 import { Loader2 } from "lucide-react";
@@ -12,6 +12,7 @@ import { Loader2 } from "lucide-react";
 const Signup = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -33,7 +34,7 @@ const Signup = () => {
 
     setIsLoading(true);
 
-    const result = await signup(name, email, password);
+    const result = await signup(name, email, username, password);
     
     setIsLoading(false);
 
@@ -66,7 +67,7 @@ const Signup = () => {
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Ade Mustapha"
+                placeholder="John Doe"
                 className="mt-2"
                 required
               />
@@ -79,6 +80,18 @@ const Signup = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="manager@arziki.com"
+                className="mt-2"
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="username">Username</Label>
+              <Input
+                id="username"
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="username123"
                 className="mt-2"
                 required
               />
@@ -121,7 +134,7 @@ const Signup = () => {
           </div>
         </Card>
 
-        <div className="my-6 text-center text-sm text-muted-foreground">
+        <div className="mt-6 text-center text-sm text-muted-foreground">
           <Link to="/" className="hover:text-primary transition-colors">
             ← Back to Home
           </Link>

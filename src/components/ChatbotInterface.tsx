@@ -1,9 +1,13 @@
+
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { X, Send, Volume2, FileText, BarChart3, Download, Sparkles, Mic } from "lucide-react";
 import { toast } from "sonner";
+import { useMutation } from "react-query";
+import { api } from "@/lib/api";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface Message {
   id: string;
@@ -18,6 +22,7 @@ interface ChatbotInterfaceProps {
 }
 
 const ChatbotInterface = ({ onClose, activeReport }: ChatbotInterfaceProps) => {
+  const { token } = useAuth();
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
@@ -33,6 +38,39 @@ const ChatbotInterface = ({ onClose, activeReport }: ChatbotInterfaceProps) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<any>(null);
 
+  const chatMutation = useMutation({
+    mutationFn: (message: string) => {
+      if (!token) throw new Error("Not authenticated");
+      return api.chat.sendMessage(message, token);
+    },
+    onSuccess: (response) => {
+  const safeText =
+    typeof response === "string"
+      ? response
+      : response.ai_response || JSON.stringify(response);
+
+  const botResponse: Message = {
+    id: Date.now().toString(),
+    text: safeText,
+    sender: "bot",
+    timestamp: new Date(),
+  };
+
+  setMessages((prev) => [...prev, botResponse]);
+},
+
+    onError: (error: any) => {
+      toast.error(error.message || "Failed to send message");
+      const errorMessage: Message = {
+        id: Date.now().toString(),
+        text: "Sorry, I'm having trouble processing your request. Please try again.",
+        sender: "bot",
+        timestamp: new Date(),
+      };
+      setMessages((prev) => [...prev, errorMessage]);
+    },
+  });
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -42,7 +80,6 @@ const ChatbotInterface = ({ onClose, activeReport }: ChatbotInterfaceProps) => {
   }, [messages]);
 
   useEffect(() => {
-    // Cleanup speech recognition on unmount
     return () => {
       if (recognitionRef.current) {
         recognitionRef.current.stop();
@@ -51,7 +88,7 @@ const ChatbotInterface = ({ onClose, activeReport }: ChatbotInterfaceProps) => {
   }, []);
 
   const handleSend = () => {
-    if (!input.trim()) return;
+    if (!input.trim() || chatMutation.isLoading) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -60,41 +97,11 @@ const ChatbotInterface = ({ onClose, activeReport }: ChatbotInterfaceProps) => {
       timestamp: new Date(),
     };
 
+    const messageText = input;
     setMessages([...messages, userMessage]);
     setInput("");
 
-    // Simulate bot response
-    setTimeout(() => {
-      const botResponse: Message = {
-        id: (Date.now() + 1).toString(),
-        text: generateBotResponse(input),
-        sender: "bot",
-        timestamp: new Date(),
-      };
-      setMessages((prev) => [...prev, botResponse]);
-    }, 1000);
-  };
-
-  const generateBotResponse = (userInput: string) => {
-    const lowerInput = userInput.toLowerCase();
-    
-    if (lowerInput.includes("stockout") || lowerInput.includes("stock out")) {
-      return "Based on your current sales trends, I've identified 3 products at risk of stockout within the next 2 weeks: Coca-Cola (7 days), Rice 25kg (10 days), and Cooking Oil (12 days). Would you like me to generate a restock recommendation?";
-    }
-    
-    if (lowerInput.includes("sales") || lowerInput.includes("performance")) {
-      return "Your sales performance shows a 15% increase this month compared to last month. Top-performing categories are Beverages (+22%) and Groceries (+18%). Would you like to see a detailed trend chart?";
-    }
-    
-    if (lowerInput.includes("forecast") || lowerInput.includes("predict")) {
-      return "The AI forecast predicts a 12% increase in demand for the next 4 weeks, with peak demand expected during weeks 2 and 3. I recommend increasing stock levels for fast-moving items by 20%.";
-    }
-    
-    if (lowerInput.includes("profit") || lowerInput.includes("revenue")) {
-      return "Your current profit margin is 18.5%. Top profit-generating products are Electronics (25% margin) and Household Items (22% margin). I can help you identify opportunities to improve margins further.";
-    }
-    
-    return "I understand you're asking about your business data. I can help you with demand forecasts, stockout predictions, sales trends, and profitability analysis. What specific aspect would you like to explore?";
+    chatMutation.mutate(messageText);
   };
 
   const quickActions = [
@@ -124,7 +131,6 @@ const ChatbotInterface = ({ onClose, activeReport }: ChatbotInterfaceProps) => {
   };
 
   const handleAudioInput = () => {
-    // Check browser support
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     
     if (!SpeechRecognition) {
@@ -133,7 +139,6 @@ const ChatbotInterface = ({ onClose, activeReport }: ChatbotInterfaceProps) => {
     }
 
     if (!isRecording) {
-      // Start recording
       try {
         if (!recognitionRef.current) {
           recognitionRef.current = new SpeechRecognition();
@@ -153,7 +158,6 @@ const ChatbotInterface = ({ onClose, activeReport }: ChatbotInterfaceProps) => {
           };
 
           recognitionRef.current.onerror = (event) => {
-            console.error("Speech recognition error:", event.error);
             setIsRecording(false);
             if (event.error === 'no-speech') {
               toast.error("No speech detected. Please try again.");
@@ -171,15 +175,11 @@ const ChatbotInterface = ({ onClose, activeReport }: ChatbotInterfaceProps) => {
 
         recognitionRef.current.start();
       } catch (error) {
-        console.error("Failed to start recording:", error);
         toast.error("Failed to start voice input");
         setIsRecording(false);
       }
     } else {
-      // Stop recording
-      if (recognitionRef.current) {
-        recognitionRef.current.stop();
-      }
+      if (recognitionRef.current) recognitionRef.current.stop();
       setIsRecording(false);
       toast.info("Voice input stopped");
     }
@@ -188,7 +188,7 @@ const ChatbotInterface = ({ onClose, activeReport }: ChatbotInterfaceProps) => {
   return (
     <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4">
       <Card className="w-full max-w-3xl h-[600px] flex flex-col bg-gradient-to-b from-card to-secondary/30 shadow-2xl">
-        {/* Header */}
+        
         <div className="flex items-center justify-between p-4 border-b border-border">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
@@ -204,7 +204,6 @@ const ChatbotInterface = ({ onClose, activeReport }: ChatbotInterfaceProps) => {
           </Button>
         </div>
 
-        {/* Messages */}
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
           {messages.map((message) => (
             <div
@@ -241,7 +240,12 @@ const ChatbotInterface = ({ onClose, activeReport }: ChatbotInterfaceProps) => {
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Quick Actions */}
+        {chatMutation.isLoading && (
+          <div className="px-4 py-2 border-t border-border bg-secondary/20">
+            <p className="text-sm text-muted-foreground animate-pulse text-center">Arziki Assistant is typing...</p>
+          </div>
+        )}
+
         <div className="px-4 py-2 border-t border-border bg-secondary/20">
           <div className="flex gap-2 flex-wrap">
             {quickActions.map((action, idx) => (
@@ -259,7 +263,6 @@ const ChatbotInterface = ({ onClose, activeReport }: ChatbotInterfaceProps) => {
           </div>
         </div>
 
-        {/* Input */}
         <div className="p-4 border-t border-border">
           <div className="flex gap-2">
             <div className="relative flex-1">
@@ -281,7 +284,12 @@ const ChatbotInterface = ({ onClose, activeReport }: ChatbotInterfaceProps) => {
                 <Mic className="w-4 h-4" />
               </Button>
             </div>
-            <Button onClick={handleSend} variant="hero" size="icon">
+            <Button 
+              onClick={handleSend} 
+              variant="hero" 
+              size="icon"
+              disabled={chatMutation.isLoading}
+            >
               <Send className="w-4 h-4" />
             </Button>
           </div>

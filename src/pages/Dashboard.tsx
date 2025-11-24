@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { FileText, Download, MessageSquare, Calendar, TrendingUp, LogOut, Plus } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "@/contexts/useAuth";
+import { useAuth } from "@/contexts/AuthContext";
 import logoIcon from "@/assets/logo-icon.png";
 import ChatbotInterface from "@/components/ChatbotInterface";
 import { toast } from "sonner";
@@ -74,34 +74,35 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b border-border/50 backdrop-blur-sm bg-background/80 sticky  top-0 z-40">
+      <header className="border-b border-border/50 backdrop-blur-sm bg-background/80">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <img src={logoIcon} alt="Arziki" className="w-10 h-10" />
             <div>
               <h1 className="text-2xl font-bold text-primary">Arziki</h1>
-              {user && <p className="text-xs text-muted-foreground">Welcome, {user.email}</p>}
+              {user && <p className="text-xs text-muted-foreground">Welcome, {user.username.charAt(0).toUpperCase() + user.username.slice(1)}</p>}
             </div>
           </div>
-          <div className="flex flex-col sm:flex-row gap-2">
+          <div className="flex gap-2">
             <Link to="/create-report">
               <Button variant="hero" size="sm">
-                <Plus className="w-4 h-4 mr-1x" />
+                <Plus className="w-4 h-4 mr-2" />
                 Generate Report
               </Button>
             </Link>
             <Button variant="ghost" size="sm" onClick={handleLogout}>
-              <LogOut className="w-4 h-4 mr-1" />
+              <LogOut className="w-4 h-4 mr-2" />
               Logout
             </Button>
           </div>
         </div>
       </header>
 
-      <div className="container mx-auto px-4 pt-2 pb-12">
+      <div className="container mx-auto px-4 py-12">
         <div className="max-w-6xl mx-auto">
           <div className="mb-8">
-            <p className="text-muted-foreground font-bold">View and manage your AI-generated business insights</p>
+            <h1 className="text-4xl font-bold mb-2 text-foreground">Dashboard</h1>
+            <p className="text-muted-foreground">View and manage your AI-generated business insights</p>
           </div>
 
           <div className="grid lg:grid-cols-3 gap-8">
@@ -187,7 +188,7 @@ const Dashboard = () => {
               <Card className="p-6 bg-secondary/20">
                 <h3 className="font-semibold mb-3 text-foreground">Need Help?</h3>
                 <p className="text-sm text-muted-foreground mb-4">
-                  Chat with Arziki Assistant to understand all your reports better
+                  Chat with Arziki Assistant to understand your reports better
                 </p>
                 <Button 
                   variant="outline" 

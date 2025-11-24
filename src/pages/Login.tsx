@@ -4,13 +4,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "@/contexts/useAuth";
+import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import logoIcon from "@/assets/logo-icon.png";
 import { Loader2 } from "lucide-react";
 
 const Login = () => {
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
@@ -20,7 +20,7 @@ const Login = () => {
     e.preventDefault();
     setIsLoading(true);
 
-    const result = await login(email, password);
+    const result = await login(username, password);
     
     setIsLoading(false);
 
@@ -47,13 +47,13 @@ const Login = () => {
         <Card className="p-8 bg-gradient-to-b from-card to-secondary/30 shadow-lg">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="username">Username</Label>
               <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="manager@arziki.com"
+                id="username"
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="username123"
                 className="mt-2"
                 required
               />
