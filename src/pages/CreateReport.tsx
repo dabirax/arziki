@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { Loader2, CheckCircle2, Upload, ArrowLeft, Plus, Trash2, LogOut } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "@/contexts/useAuth";
+import { useAuth } from "@/contexts/AuthContext";
 import logoIcon from "@/assets/logo-icon.png";
 
 type Step = "business" | "product" | "stock" | "supplier" | "review" | "processing" | "success";
@@ -326,7 +326,7 @@ const CreateReport = () => {
                   ))}
                   <Button type="button" variant="outline" onClick={addProduct} className="w-full">
                     <Plus className="w-4 h-4 mr-2" /> Add Another Product
-                  </Button>
+                  </Button>                  
                   <div className="flex gap-4">
                     <Button type="button" variant="outline" onClick={() => setStep("business")} className="flex-1">Back</Button>
                     <Button type="button" variant="outline" onClick={() => setStep("review")} className="flex-1">Skip to Uploads</Button>
