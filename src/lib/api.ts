@@ -1,4 +1,4 @@
-const API_BASE_URL = "https://187df8056df4.ngrok-free.app";
+const API_BASE_URL = "https://arziki.onrender.com";
 
 export const api = {
   auth: {
